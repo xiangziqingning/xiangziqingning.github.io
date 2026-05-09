@@ -3,132 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的个人网站</title>
+<title>星火软件资源站</title>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+
 body{
-  min-height:100vh;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:radial-gradient(circle at top,#1e3a8a,#020617 55%,#000);
+  background:#050816;
   color:white;
-  overflow-x:hidden;
+  min-height:100vh;
 }
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 10%,rgba(0,200,255,.25),transparent 30%),
+    radial-gradient(circle at 80% 20%,rgba(138,43,226,.25),transparent 35%),
+    radial-gradient(circle at 50% 100%,rgba(255,0,128,.15),transparent 40%);
+  z-index:-1;
+}
+
 .nav{
-  width:90%;
-  margin:20px auto;
-  padding:16px 22px;
+  width:92%;
+  margin:18px auto;
+  padding:15px 20px;
+  border-radius:22px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:22px;
   background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
   backdrop-filter:blur(18px);
 }
-.logo{font-size:22px;font-weight:800;color:#38bdf8}
-.nav span{color:#cbd5e1;font-size:14px}
-.hero{
-  width:90%;
-  margin:80px auto 40px;
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:30px;
-  align-items:center;
+
+.logo{
+  font-size:22px;
+  font-weight:900;
+  color:#38bdf8;
 }
+
+.nav span{
+  font-size:14px;
+  color:#cbd5e1;
+}
+
+.hero{
+  width:92%;
+  margin:45px auto 25px;
+  padding:38px 28px;
+  border-radius:32px;
+  background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(139,92,246,.18));
+  border:1px solid rgba(255,255,255,.16);
+}
+
 .badge{
   display:inline-block;
   padding:8px 14px;
   border-radius:999px;
   background:rgba(56,189,248,.15);
   color:#7dd3fc;
-  margin-bottom:20px;
+  margin-bottom:18px;
+  font-size:14px;
 }
-h1{
-  font-size:58px;
-  line-height:1.1;
-  margin-bottom:22px;
+
+.hero h1{
+  font-size:44px;
+  line-height:1.15;
+  margin-bottom:16px;
 }
-h1 span{color:#38bdf8}
-.desc{
+
+.hero h1 span{
+  color:#38bdf8;
+}
+
+.hero p{
   color:#cbd5e1;
-  font-size:18px;
+  font-size:17px;
   line-height:1.8;
-  max-width:650px;
 }
-.btns{margin-top:34px;display:flex;gap:16px;flex-wrap:wrap}
-.btn{
-  padding:14px 24px;
-  border-radius:16px;
-  text-decoration:none;
+
+.search-box{
+  width:92%;
+  margin:25px auto;
+  display:flex;
+  gap:12px;
+}
+
+.search-box input{
+  flex:1;
+  padding:16px 18px;
+  border:none;
+  outline:none;
+  border-radius:18px;
   color:white;
-  font-weight:700;
-}
-.primary{background:linear-gradient(135deg,#38bdf8,#2563eb)}
-.secondary{border:1px solid rgba(255,255,255,.25)}
-.card{
-  padding:28px;
-  border-radius:30px;
   background:rgba(255,255,255,.1);
   border:1px solid rgba(255,255,255,.15);
-  backdrop-filter:blur(20px);
-  box-shadow:0 20px 60px rgba(0,0,0,.35);
 }
-.avatar{
-  height:260px;
-  border-radius:24px;
-  background:linear-gradient(135deg,#0ea5e9,#8b5cf6,#ec4899);
+
+.search-box button{
+  padding:0 22px;
+  border:none;
+  border-radius:18px;
+  background:linear-gradient(135deg,#38bdf8,#2563eb);
+  color:white;
+  font-weight:800;
+}
+
+.categories{
+  width:92%;
+  margin:20px auto;
   display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:72px;
-  font-weight:900;
+  gap:12px;
+  overflow-x:auto;
+  padding-bottom:8px;
 }
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-  width:90%;
-  margin:40px auto;
-}
-.stat{
-  padding:24px;
-  border-radius:22px;
+
+.cat{
+  white-space:nowrap;
+  padding:10px 16px;
+  border-radius:999px;
   background:rgba(255,255,255,.08);
   border:1px solid rgba(255,255,255,.12);
+  color:#cbd5e1;
 }
-.stat h2{color:#38bdf8;font-size:32px}
-.stat p{color:#cbd5e1;margin-top:8px}
+
+.cat.active{
+  background:#38bdf8;
+  color:#020617;
+  font-weight:900;
+}
+
 .section{
-  width:90%;
-  margin:60px auto;
+  width:92%;
+  margin:35px auto;
 }
-.section h2{
-  font-size:34px;
-  margin-bottom:24px;
+
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
 }
+
+.section-title h2{
+  font-size:26px;
+}
+
+.section-title span{
+  color:#94a3b8;
+  font-size:14px;
+}
+
 .grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:20px;
+  gap:18px;
 }
-.work{
-  padding:24px;
-  min-height:180px;
+
+.card{
+  padding:22px;
   border-radius:26px;
   background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.13);
+  backdrop-filter:blur(18px);
+  transition:.25s;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  border-color:#38bdf8;
+}
+
+.icon{
+  width:54px;
+  height:54px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  background:linear-gradient(135deg,#38bdf8,#8b5cf6);
+  margin-bottom:16px;
+}
+
+.card h3{
+  font-size:21px;
+  margin-bottom:10px;
+}
+
+.card p{
+  color:#cbd5e1;
+  line-height:1.7;
+  font-size:15px;
+}
+
+.tags{
+  margin:16px 0;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.tag{
+  padding:5px 9px;
+  border-radius:999px;
+  background:rgba(56,189,248,.13);
+  color:#7dd3fc;
+  font-size:12px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+.actions a{
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+  padding:10px;
+  border-radius:14px;
+  font-weight:800;
+  font-size:14px;
+}
+
+.download{
+  color:white;
+  background:linear-gradient(135deg,#38bdf8,#2563eb);
+}
+
+.detail{
+  color:#cbd5e1;
+  border:1px solid rgba(255,255,255,.16);
+}
+
+.forum{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.post{
+  padding:20px;
+  border-radius:24px;
+  background:rgba(255,255,255,.07);
   border:1px solid rgba(255,255,255,.12);
 }
-.work h3{font-size:22px;margin-bottom:12px}
-.work p{color:#cbd5e1;line-height:1.7}
+
+.post h3{
+  font-size:19px;
+  margin-bottom:10px;
+}
+
+.post p{
+  color:#cbd5e1;
+  line-height:1.7;
+}
+
 .footer{
   text-align:center;
-  color:#94a3b8;
   padding:40px 20px;
+  color:#94a3b8;
 }
-@media(max-width:800px){
-  .hero{grid-template-columns:1fr;margin-top:40px}
-  h1{font-size:42px}
-  .stats,.grid{grid-template-columns:1fr}
+
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .forum{grid-template-columns:1fr}
+  .hero h1{font-size:34px}
+  .nav{flex-direction:column;gap:8px}
 }
 </style>
 </head>
@@ -136,75 +282,173 @@ h1 span{color:#38bdf8}
 <body>
 
 <div class="nav">
-  <div class="logo">MySite</div>
-  <span>个人主页 / 作品展示 / 学习记录</span>
+  <div class="logo">星火软件站</div>
+  <span>软件资源 · AI工具 · 学习教程 · 技术交流</span>
 </div>
 
 <section class="hero">
-  <div>
-    <div class="badge">欢迎来到我的网站</div>
-    <h1>你好，我是<br><span>网站创作者</span></h1>
-    <p class="desc">
-      这是我的第一个个人网站。我会在这里展示我的作品、想法、项目和成长记录。
-      这个页面由我亲手搭建，并托管在 GitHub Pages 上。
-    </p >
-    <div class="btns">
-      <a class="btn primary" href=" ">查看作品</a >
-      <a class="btn secondary" href="#about">了解更多</a >
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="avatar">X</div>
-  </div>
+  <div class="badge">免费资源分享社区</div>
+  <h1>发现好用软件，<br><span>收藏你的数字工具库</span></h1>
+  <p>
+    这里是一个软件资源收集与分享网站，未来可以用来整理 AI 工具、设计插件、
+    手机软件、学习资源、网站源码和实用教程。
+  </p>
 </section>
 
-<div class="stats">
-  <div class="stat">
-    <h2>01</h2>
-    <p>我的第一个网站</p >
-  </div>
-  <div class="stat">
-    <h2>100%</h2>
-    <p>免费部署上线</p >
-  </div>
-  <div class="stat">
-    <h2>∞</h2>
-    <p>持续更新成长</p >
-  </div>
+<div class="search-box">
+  <input id="searchInput" type="text" placeholder="搜索软件、AI工具、插件、教程...">
+  <button onclick="searchSoftware()">搜索</button>
 </div>
 
-<section class="section" id="works">
-  <h2>作品展示</h2>
-  <div class="grid">
-    <div class="work">
-      <h3>项目一</h3>
-      <p>这里可以放你的第一个作品，比如网页、小工具、IP设计或个人介绍。</p >
+<div class="categories">
+  <div class="cat active">全部资源</div>
+  <div class="cat">AI工具</div>
+  <div class="cat">设计软件</div>
+  <div class="cat">手机APP</div>
+  <div class="cat">剪辑工具</div>
+  <div class="cat">学习资源</div>
+  <div class="cat">网站源码</div>
+</div>
+
+<section class="section">
+  <div class="section-title">
+    <h2>热门软件资源</h2>
+    <span>持续更新中</span>
+  </div>
+
+  <div class="grid" id="softwareGrid">
+
+    <div class="card">
+      <div class="icon">🤖</div>
+      <h3>AI写作助手</h3>
+      <p>适合写文章、改文案、做作业辅助和生成创意内容的AI工具合集。</p>
+      <div class="tags">
+        <span class="tag">AI</span>
+        <span class="tag">写作</span>
+        <span class="tag">效率</span>
+      </div>
+      <div class="actions">
+        <a class="download" href="#">获取资源</a>
+        <a class="detail" href="#">查看详情</a>
+      </div>
     </div>
-    <div class="work">
-      <h3>项目二</h3>
-      <p>这里可以放你的学习记录，比如你学会了 GitHub、HTML 和网站部署。</p >
+
+    <div class="card">
+      <div class="icon">🎨</div>
+      <h3>设计插件合集</h3>
+      <p>PS、AI、Figma 常用设计插件与素材工具，适合设计学习与作品制作。</p>
+      <div class="tags">
+        <span class="tag">设计</span>
+        <span class="tag">插件</span>
+        <span class="tag">素材</span>
+      </div>
+      <div class="actions">
+        <a class="download" href="#">获取资源</a>
+        <a class="detail" href="#">查看详情</a>
+      </div>
     </div>
-    <div class="work">
-      <h3>项目三</h3>
-      <p>这里可以放未来计划，比如个人品牌、作品集、工具站或外贸网站。</p >
+
+    <div class="card">
+      <div class="icon">🎬</div>
+      <h3>剪辑工具箱</h3>
+      <p>适合短视频、课程剪辑、字幕生成、封面制作的实用工具整理。</p>
+      <div class="tags">
+        <span class="tag">剪辑</span>
+        <span class="tag">视频</span>
+        <span class="tag">字幕</span>
+      </div>
+      <div class="actions">
+        <a class="download" href="#">获取资源</a>
+        <a class="detail" href="#">查看详情</a>
+      </div>
     </div>
+
+    <div class="card">
+      <div class="icon">📱</div>
+      <h3>安卓实用APP</h3>
+      <p>整理学习、效率、文件管理、图片处理、日常工具类手机软件。</p>
+      <div class="tags">
+        <span class="tag">安卓</span>
+        <span class="tag">APP</span>
+        <span class="tag">工具</span>
+      </div>
+      <div class="actions">
+        <a class="download" href="#">获取资源</a>
+        <a class="detail" href="#">查看详情</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="icon">💻</div>
+      <h3>网站源码模板</h3>
+      <p>收集个人主页、导航站、论坛界面、工具站等前端源码模板。</p>
+      <div class="tags">
+        <span class="tag">源码</span>
+        <span class="tag">网页</span>
+        <span class="tag">模板</span>
+      </div>
+      <div class="actions">
+        <a class="download" href="#">获取资源</a>
+        <a class="detail" href="#">查看详情</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="icon">📚</div>
+      <h3>学习资源库</h3>
+      <p>整理编程、设计、英语、AI使用、建站教程等学习资料入口。</p>
+      <div class="tags">
+        <span class="tag">学习</span>
+        <span class="tag">教程</span>
+        <span class="tag">资料</span>
+      </div>
+      <div class="actions">
+        <a class="download" href="#">获取资源</a>
+        <a class="detail" href="#">查看详情</a>
+      </div>
+    </div>
+
   </div>
 </section>
 
-<section class="section" id="about">
-  <h2>关于这个网站</h2>
-  <div class="work">
-    <p>
-      这是一个完全免费的静态网站，适合用来练习网页设计、展示作品、发布项目。
-      以后你只需要修改 index.html，就可以不断升级这个网站。
-    </p >
+<section class="section">
+  <div class="section-title">
+    <h2>社区讨论区</h2>
+    <span>论坛雏形</span>
+  </div>
+
+  <div class="forum">
+    <div class="post">
+      <h3>新手必看：如何快速找到适合自己的工具？</h3>
+      <p>先明确用途，再看平台、价格、难度和替代方案，不要盲目下载一堆软件。</p>
+    </div>
+
+    <div class="post">
+      <h3>推荐帖：适合学生党的免费AI工具</h3>
+      <p>后续可以在这里整理免费AI工具、学习工具和建站工具，让网站慢慢丰富起来。</p>
+    </div>
   </div>
 </section>
 
 <div class="footer">
-  © 2026 MySite. Built with GitHub Pages.
+  © 2026 星火软件资源站 · Built with GitHub Pages
 </div>
 
+<script>
+function searchSoftware(){
+  const keyword = document.getElementById("searchInput").value.toLowerCase();
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach(card=>{
+    const text = card.innerText.toLowerCase();
+    if(text.includes(keyword)){
+      card.style.display="block";
+    }else{
+      card.style.display="none";
+    }
+  });
+}
+</script>
+
 </body>
-</html>
+  </html>

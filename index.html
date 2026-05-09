@@ -4,381 +4,112 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>星火软件资源站</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:#050816;
-  color:white;
-  min-height:100vh;
-}
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:
-  radial-gradient(circle at 20% 10%,rgba(0,200,255,.22),transparent 30%),
-  radial-gradient(circle at 80% 20%,rgba(168,85,247,.22),transparent 35%);
-  z-index:-1;
-}
-.nav{
-  width:92%;
-  margin:18px auto;
-  padding:16px 20px;
-  border-radius:22px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.15);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.logo{font-size:22px;font-weight:900;color:#38bdf8}
-.nav span{font-size:14px;color:#cbd5e1}
-.hero{
-  width:92%;
-  margin:35px auto;
-  padding:34px 26px;
-  border-radius:30px;
-  background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(139,92,246,.18));
-  border:1px solid rgba(255,255,255,.15);
-}
-.hero h1{font-size:40px;line-height:1.2;margin-bottom:14px}
-.hero h1 span{color:#38bdf8}
-.hero p{color:#cbd5e1;line-height:1.8}
-.search{
-  width:92%;
-  margin:20px auto;
-  display:flex;
-  gap:10px;
-}
-.search input{
-  flex:1;
-  padding:15px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.15);
-  background:rgba(255,255,255,.08);
-  color:white;
-  outline:none;
-}
-.search button{
-  padding:0 20px;
-  border:none;
-  border-radius:16px;
-  color:white;
-  font-weight:900;
-  background:linear-gradient(135deg,#38bdf8,#2563eb);
-}
-.tabs{
-  width:92%;
-  margin:18px auto;
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-}
-.tab{
-  white-space:nowrap;
-  padding:10px 15px;
-  border-radius:999px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.12);
-  color:#cbd5e1;
-}
-.tab.active{background:#38bdf8;color:#020617;font-weight:900}
-.section{
-  width:92%;
-  margin:32px auto;
-}
-.section h2{font-size:26px;margin-bottom:18px}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-}
-.card{
-  padding:22px;
-  border-radius:24px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.13);
-}
-.icon{
-  width:54px;
-  height:54px;
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:26px;
-  background:linear-gradient(135deg,#38bdf8,#8b5cf6);
-  margin-bottom:14px;
-}
-.card h3{font-size:21px;margin-bottom:10px}
-.card p{color:#cbd5e1;line-height:1.7;font-size:15px}
-.tags{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.tag{
-  padding:5px 9px;
-  border-radius:999px;
-  background:rgba(56,189,248,.15);
-  color:#7dd3fc;
-  font-size:12px;
-}
-.btns{display:flex;gap:10px;margin-top:14px}
-.btn{
-  flex:1;
-  text-align:center;
-  padding:11px;
-  border-radius:14px;
-  text-decoration:none;
-  font-weight:900;
-  font-size:14px;
-}
-.download{background:linear-gradient(135deg,#38bdf8,#2563eb);color:white}
-.detail{border:1px solid rgba(255,255,255,.18);color:#cbd5e1}
-.post{
-  padding:20px;
-  border-radius:22px;
-  background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.12);
-  margin-bottom:14px;
-}
-.post h3{margin-bottom:8px}
-.post p{color:#cbd5e1;line-height:1.7}
-.footer{text-align:center;color:#94a3b8;padding:40px 20px}
-
-/* 新页面 */
-.page{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#050816;
-  z-index:999;
-  overflow:auto;
-  padding:24px;
-}
-.pageBox{
-  max-width:900px;
-  margin:auto;
-}
-.back{
-  padding:12px 18px;
-  border:none;
-  border-radius:14px;
-  background:#38bdf8;
-  color:#020617;
-  font-weight:900;
-  margin-bottom:24px;
-}
-.page h1{
-  font-size:34px;
-  color:#38bdf8;
-  margin-bottom:12px;
-}
-.page p{
-  color:#cbd5e1;
-  line-height:1.8;
-  margin-bottom:22px;
-}
-.file{
-  padding:18px;
-  border-radius:18px;
-  margin-bottom:12px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.12);
-}
-.file b{color:white}
-.file span{display:block;color:#94a3b8;margin-top:6px}
-.file a{
-  display:inline-block;
-  margin-top:12px;
-  padding:10px 14px;
-  border-radius:12px;
-  background:linear-gradient(135deg,#38bdf8,#2563eb);
-  color:white;
-  text-decoration:none;
-  font-weight:900;
-}
-@media(max-width:900px){
-  .grid{grid-template-columns:1fr}
-  .hero h1{font-size:32px}
-  .nav{flex-direction:column;gap:8px}
-}
+body{font-family:Arial,sans-serif;background:#050816;color:white;padding:18px}
+h1{font-size:34px;margin:20px 0;color:#38bdf8}
+.box,.card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:22px;padding:18px;margin:16px 0}
+input,textarea,select{width:100%;padding:14px;margin:8px 0;border-radius:12px;border:0;background:#111827;color:white}
+button{width:100%;padding:14px;border:0;border-radius:14px;background:#38bdf8;color:#020617;font-weight:bold;font-size:16px}
+.card h3{color:#7dd3fc;margin-bottom:8px}
+.card p{color:#cbd5e1;line-height:1.6}
+.tag{display:inline-block;margin:8px 0;padding:5px 10px;border-radius:20px;background:#1e40af;color:#bfdbfe}
+a{color:#38bdf8}
 </style>
 </head>
-
 <body>
 
-<div class="nav">
-  <div class="logo">星火软件站</div>
-  <span>软件资源 · AI工具 · 教程分享 · 技术交流</span>
+<h1>星火软件资源站</h1>
+<p>动态资源发布网站：提交后会保存到 Supabase 数据库。</p>
+
+<div class="box">
+  <h2>发布资源</h2>
+  <input id="title" placeholder="资源名称，例如：AI写作助手">
+  <select id="category">
+    <option>AI工具</option>
+    <option>设计软件</option>
+    <option>手机APP</option>
+    <option>学习资料</option>
+    <option>网站源码</option>
+    <option>其他资源</option>
+  </select>
+  <textarea id="description" placeholder="资源介绍"></textarea>
+  <input id="link" placeholder="资源链接，例如网盘链接/下载地址">
+  <button onclick="addResource()">发布资源</button>
 </div>
 
-<section class="hero">
-  <h1>发现好用软件，<br><span>建立你的资源仓库</span></h1>
-  <p>这里可以收集软件、插件、AI工具、学习资料、网站源码和教程。点击按钮后，会进入新的资源详情界面。</p>
-</section>
-
-<div class="search">
-  <input id="searchInput" placeholder="搜索软件、工具、教程...">
-  <button onclick="searchCard()">搜索</button>
-</div>
-
-<div class="tabs">
-  <div class="tab active">全部</div>
-  <div class="tab">AI工具</div>
-  <div class="tab">设计软件</div>
-  <div class="tab">手机APP</div>
-  <div class="tab">学习资源</div>
-  <div class="tab">网站源码</div>
-</div>
-
-<section class="section">
-  <h2>热门资源</h2>
-
-  <div class="grid">
-
-    <div class="card">
-      <div class="icon">🤖</div>
-      <h3>AI写作助手</h3>
-      <p>适合写文章、改文案、整理资料、生成创意内容。</p>
-      <div class="tags">
-        <span class="tag">AI</span><span class="tag">写作</span><span class="tag">效率</span>
-      </div>
-      <div class="btns">
-        <a class="btn download" onclick="openPage('AI写作助手资源包','这里陈列AI写作助手相关文件。')">获取资源</a>
-        <a class="btn detail" onclick="openPage('AI写作助手介绍','这是AI写作助手的详细介绍页面。')">查看详情</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="icon">🎨</div>
-      <h3>设计插件合集</h3>
-      <p>适合PS、AI、Figma等设计工具的插件和素材。</p>
-      <div class="tags">
-        <span class="tag">设计</span><span class="tag">插件</span><span class="tag">素材</span>
-      </div>
-      <div class="btns">
-        <a class="btn download" onclick="openPage('设计插件资源包','这里陈列设计插件、素材包、安装教程。')">获取资源</a>
-        <a class="btn detail" onclick="openPage('设计插件介绍','这里介绍插件用途、适合人群和使用方法。')">查看详情</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="icon">🎬</div>
-      <h3>剪辑工具箱</h3>
-      <p>短视频剪辑、字幕生成、封面制作、素材整理工具。</p>
-      <div class="tags">
-        <span class="tag">剪辑</span><span class="tag">视频</span><span class="tag">字幕</span>
-      </div>
-      <div class="btns">
-        <a class="btn download" onclick="openPage('剪辑工具资源包','这里陈列剪辑软件、字幕工具、封面工具。')">获取资源</a>
-        <a class="btn detail" onclick="openPage('剪辑工具介绍','这里介绍剪辑工具的使用方法。')">查看详情</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="icon">📱</div>
-      <h3>安卓实用APP</h3>
-      <p>文件管理、图片处理、效率学习、生活工具类APP。</p>
-      <div class="tags">
-        <span class="tag">安卓</span><span class="tag">APP</span><span class="tag">工具</span>
-      </div>
-      <div class="btns">
-        <a class="btn download" onclick="openPage('安卓APP资源包','这里陈列安卓APP安装包和说明。')">获取资源</a>
-        <a class="btn detail" onclick="openPage('安卓APP介绍','这里介绍APP用途和注意事项。')">查看详情</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="icon">💻</div>
-      <h3>网站源码模板</h3>
-      <p>个人主页、导航站、论坛界面、工具站源码模板。</p>
-      <div class="tags">
-        <span class="tag">源码</span><span class="tag">网页</span><span class="tag">模板</span>
-      </div>
-      <div class="btns">
-        <a class="btn download" onclick="openPage('网站源码资源包','这里陈列HTML源码、模板和使用教程。')">获取资源</a>
-        <a class="btn detail" onclick="openPage('网站源码介绍','这里介绍如何使用这些源码。')">查看详情</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="icon">📚</div>
-      <h3>学习资源库</h3>
-      <p>编程、设计、AI使用、建站、英语学习资料。</p>
-      <div class="tags">
-        <span class="tag">学习</span><span class="tag">教程</span><span class="tag">资料</span>
-      </div>
-      <div class="btns">
-        <a class="btn download" onclick="openPage('学习资料资源包','这里陈列学习资料、电子书和教程链接。')">获取资源</a>
-        <a class="btn detail" onclick="openPage('学习资料介绍','这里介绍学习路线和资料分类。')">查看详情</a>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section class="section">
-  <h2>社区讨论区</h2>
-
-  <div class="post" onclick="openPage('新手交流帖','这里以后可以放大家的问题、教程、经验分享。')">
-    <h3>新手必看：怎么选择适合自己的软件？</h3>
-    <p>点击进入帖子详情界面。</p>
-  </div>
-
-  <div class="post" onclick="openPage('资源推荐帖','这里以后可以整理大家推荐的软件和工具。')">
-    <h3>推荐帖：适合学生党的免费工具</h3>
-    <p>点击进入帖子详情界面。</p>
-  </div>
-</section>
-
-<div class="footer">
-  © 2026 星火软件资源站 · Built with GitHub Pages
-</div>
-
-<div id="newPage" class="page">
-  <div class="pageBox">
-    <button class="back" onclick="closePage()">← 返回首页</button>
-    <h1 id="pageTitle">标题</h1>
-    <p id="pageDesc">内容介绍</p>
-
-    <div class="file">
-      <b>📦 软件安装包.zip</b>
-      <span>这里以后可以放真正的下载地址、网盘链接或说明。</span>
-      <a href="javascript:void(0)">下载资源</a>
-    </div>
-
-    <div class="file">
-      <b>📄 使用教程.txt</b>
-      <span>这里可以写安装方法、使用说明、注意事项。</span>
-      <a href="javascript:void(0)">查看教程</a>
-    </div>
-
-    <div class="file">
-      <b>🔗 备用链接</b>
-      <span>这里可以放备用资源链接，防止主链接失效。</span>
-      <a href="javascript:void(0)">打开链接</a>
-    </div>
-  </div>
+<div class="box">
+  <h2>资源列表</h2>
+  <div id="list">正在加载...</div>
 </div>
 
 <script>
-function searchCard(){
-  var keyword=document.getElementById("searchInput").value.toLowerCase();
-  var cards=document.querySelectorAll(".card");
-  cards.forEach(function(card){
-    var text=card.innerText.toLowerCase();
-    card.style.display=text.includes(keyword)?"block":"none";
+const SUPABASE_URL = "https://lwcuqcddipwmvauykjic.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Y3VxY2RkaXB3bXZhdXlramljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzNDE1MzMzImV4cCI6MjA5MzkxNzUzM30.ERnWXOOjtflnE71pXVgYdjF1D3AXkutxX1WDkJAFbdg";
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadResources(){
+  const list = document.getElementById("list");
+  list.innerHTML = "正在加载...";
+
+  const { data, error } = await db
+    .from("resources")
+    .select("*")
+    .order("id", { ascending:false });
+
+  if(error){
+    list.innerHTML = "读取失败：" + error.message;
+    return;
+  }
+
+  if(!data || data.length === 0){
+    list.innerHTML = "暂无资源，先发布一个试试。";
+    return;
+  }
+
+  list.innerHTML = "";
+  data.forEach(item=>{
+    list.innerHTML += `
+      <div class="card">
+        <h3>${item.title || "未命名资源"}</h3>
+        <span class="tag">${item.category || "未分类"}</span>
+        <p>${item.description || "暂无介绍"}</p>
+        ${item.link ? `<a href="${item.link}" target="_blank">打开资源链接</a>` : ""}
+      </div>
+    `;
   });
 }
 
-function openPage(title,desc){
-  document.getElementById("pageTitle").innerText=title;
-  document.getElementById("pageDesc").innerText=desc;
-  document.getElementById("newPage").style.display="block";
+async function addResource(){
+  const title = document.getElementById("title").value.trim();
+  const category = document.getElementById("category").value;
+  const description = document.getElementById("description").value.trim();
+  const link = document.getElementById("link").value.trim();
+
+  if(!title){
+    alert("资源名称不能为空");
+    return;
+  }
+
+  const { error } = await db.from("resources").insert([
+    { title, category, description, link }
+  ]);
+
+  if(error){
+    alert("发布失败：" + error.message);
+    return;
+  }
+
+  alert("发布成功！");
+  document.getElementById("title").value="";
+  document.getElementById("description").value="";
+  document.getElementById("link").value="";
+  loadResources();
 }
 
-function closePage(){
-  document.getElementById("newPage").style.display="none";
-}
+loadResources();
 </script>
 
 </body>

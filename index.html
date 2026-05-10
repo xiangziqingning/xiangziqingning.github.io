@@ -12,20 +12,23 @@ h1{color:#38bdf8;font-size:34px}
 input,textarea,select,button{width:100%;padding:14px;margin:8px 0;border-radius:12px;border:0;font-size:16px}
 input,textarea,select{background:#020617;color:white}
 button{background:#38bdf8;color:#020617;font-weight:bold}
+.delete{background:#ef4444;color:white}
+.back{background:#64748b;color:white}
 .tag{display:inline-block;background:#1e40af;padding:5px 10px;border-radius:20px;margin:8px 0}
 a{color:#38bdf8}
 .btns{display:flex;gap:10px;margin-top:12px}
 .btns button{width:50%}
-.delete{background:#ef4444;color:white}
+.hide{display:none}
 </style>
 </head>
 <body>
 
+<div id="homePage">
 <h1>星火软件资源站</h1>
-<p>动态资源发布网站</p >
+<p>动态资源发布网站</p>
 
 <div class="box">
-<h2>发布资源</h2>
+<h2 id="formTitle">发布资源</h2>
 <input id="title" placeholder="资源名称">
 <select id="category">
 <option>AI工具</option>
@@ -37,12 +40,18 @@ a{color:#38bdf8}
 </select>
 <textarea id="description" placeholder="资源介绍"></textarea>
 <input id="link" placeholder="资源链接">
-<button onclick="addResource()">发布资源</button>
+<button onclick="addResource()">发布/保存资源</button>
 </div>
 
 <div class="box">
 <h2>资源列表</h2>
 <div id="list">正在加载...</div>
+</div>
+</div>
+
+<div id="detailPage" class="hide">
+<button class="back" onclick="backHome()">返回首页</button>
+<div id="detail"></div>
 </div>
 
 <script>
@@ -51,6 +60,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let editingId = null;
+let allResources = [];
 
 async function loadResources(){
   const list = document.getElementById("list");
@@ -63,27 +73,55 @@ async function loadResources(){
     return;
   }
 
-  if(!data || data.length === 0){
+  allResources = data || [];
+
+  if(allResources.length === 0){
     list.innerHTML = "暂无资源";
     return;
   }
 
   list.innerHTML = "";
 
-  data.forEach(item=>{
+  allResources.forEach(item=>{
     list.innerHTML += `
       <div class="card">
         <h3>${item.title || "未命名资源"}</h3>
         <span class="tag">${item.category || "未分类"}</span>
-        <p>${item.description || "暂无介绍"}</p >
-        ${item.link ? `<a href=" " target="_blank">打开资源</a >` : ""}
-        <div class="btns">
-          <button onclick="editResource(${item.id})">编辑</button>
-          <button class="delete" onclick="deleteResource(${item.id})">删除</button>
-        </div>
+        <p>${item.description || "暂无介绍"}</p>
+        <button onclick="showDetail(${item.id})">查看详情</button>
       </div>
     `;
   });
+}
+
+function showDetail(id){
+  const item = allResources.find(x=>x.id===id);
+  if(!item) return;
+
+  document.getElementById("homePage").classList.add("hide");
+  document.getElementById("detailPage").classList.remove("hide");
+
+  document.getElementById("detail").innerHTML = `
+    <div class="card">
+      <h1>${item.title || "未命名资源"}</h1>
+      <span class="tag">${item.category || "未分类"}</span>
+      <p>${item.description || "暂无介绍"}</p>
+      ${item.link ? `<a href="${item.link}" target="_blank">打开资源链接</a>` : "<p>暂无链接</p>"}
+
+      <div class="btns">
+        <button onclick="editResource(${item.id})">编辑</button>
+        <button class="delete" onclick="deleteResource(${item.id})">删除</button>
+      </div>
+    </div>
+  `;
+
+  location.hash = "resource-" + id;
+}
+
+function backHome(){
+  document.getElementById("detailPage").classList.add("hide");
+  document.getElementById("homePage").classList.remove("hide");
+  location.hash = "";
 }
 
 async function addResource(){
@@ -102,6 +140,7 @@ async function addResource(){
     if(error){alert("修改失败：" + error.message);return;}
     alert("修改成功");
     editingId = null;
+    document.getElementById("formTitle").innerText = "发布资源";
   }else{
     const {data:exist} = await db.from("resources").select("id").eq("title",title);
     if(exist && exist.length > 0){
@@ -114,30 +153,50 @@ async function addResource(){
     alert("发布成功");
   }
 
-  document.getElementById("title").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("link").value = "";
+  clearForm();
+  backHome();
   loadResources();
 }
 
 async function deleteResource(id){
-  if(!confirm("确定删除吗？")) return;
+  if(!confirm("确定删除这个资源吗？")) return;
+
   const {error} = await db.from("resources").delete().eq("id",id);
-  if(error){alert("删除失败：" + error.message);return;}
+
+  if(error){
+    alert("删除失败：" + error.message);
+    return;
+  }
+
   alert("删除成功");
+  backHome();
   loadResources();
 }
 
 async function editResource(id){
   const {data,error} = await db.from("resources").select("*").eq("id",id).single();
-  if(error){alert("读取失败：" + error.message);return;}
+
+  if(error){
+    alert("读取失败：" + error.message);
+    return;
+  }
 
   editingId = id;
+
   document.getElementById("title").value = data.title || "";
   document.getElementById("category").value = data.category || "AI工具";
   document.getElementById("description").value = data.description || "";
   document.getElementById("link").value = data.link || "";
+  document.getElementById("formTitle").innerText = "正在编辑资源";
+
+  backHome();
   window.scrollTo(0,0);
+}
+
+function clearForm(){
+  document.getElementById("title").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("link").value = "";
 }
 
 loadResources();

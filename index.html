@@ -1,147 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星火软件资源站</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{margin:0;padding:20px;background:#050816;color:white;font-family:Arial}
+h1{color:#38bdf8;font-size:34px}
+.box,.card{background:#111827;border:1px solid #334155;border-radius:18px;padding:18px;margin:16px 0}
+input,textarea,select,button{width:100%;padding:14px;margin:8px 0;border-radius:12px;border:0;font-size:16px}
+input,textarea,select{background:#020617;color:white}
+button{background:#38bdf8;color:#020617;font-weight:bold}
+.tag{display:inline-block;background:#1e40af;padding:5px 10px;border-radius:20px;margin:8px 0}
+a{color:#38bdf8}
+.btns{display:flex;gap:10px;margin-top:12px}
+.btns button{width:50%}
+.delete{background:#ef4444;color:white}
+</style>
+</head>
+<body>
+
+<h1>星火软件资源站</h1>
+<p>动态资源发布网站</p >
+
+<div class="box">
+<h2>发布资源</h2>
+<input id="title" placeholder="资源名称">
+<select id="category">
+<option>AI工具</option>
+<option>设计软件</option>
+<option>手机APP</option>
+<option>学习资料</option>
+<option>网站源码</option>
+<option>其他资源</option>
+</select>
+<textarea id="description" placeholder="资源介绍"></textarea>
+<input id="link" placeholder="资源链接">
+<button onclick="addResource()">发布资源</button>
+</div>
+
+<div class="box">
+<h2>资源列表</h2>
+<div id="list">正在加载...</div>
+</div>
+
 <script>
 const SUPABASE_URL = "https://lwcuqcddipwmvauykjic.supabase.co";
-
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Y3VxY2RkaXB3bXZhdXlramljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzNDE1MzMsImV4cCI6MjA5MzkxNzUzM30.ERnWXOOjtflnE71pXVgYdjF1D3AXkutxX1WDkJAFbdg";
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 let editingId = null;
 
-async function loadResources() {
+async function loadResources(){
   const list = document.getElementById("list");
   list.innerHTML = "正在加载...";
 
-  const { data, error } = await db
-    .from("resources")
-    .select("*")
-    .order("id", { ascending: false });
+  const {data,error} = await db.from("resources").select("*").order("id",{ascending:false});
 
-  if (error) {
+  if(error){
     list.innerHTML = "读取失败：" + error.message;
     return;
   }
 
-  if (!data || data.length === 0) {
+  if(!data || data.length === 0){
     list.innerHTML = "暂无资源";
     return;
   }
 
   list.innerHTML = "";
 
-  data.forEach(item => {
+  data.forEach(item=>{
     list.innerHTML += `
       <div class="card">
         <h3>${item.title || "未命名资源"}</h3>
         <span class="tag">${item.category || "未分类"}</span>
         <p>${item.description || "暂无介绍"}</p >
         ${item.link ? `<a href=" " target="_blank">打开资源</a >` : ""}
-
-        <div style="margin-top:15px;display:flex;gap:10px;">
+        <div class="btns">
           <button onclick="editResource(${item.id})">编辑</button>
-          <button onclick="deleteResource(${item.id})" style="background:#ef4444;color:white;">删除</button>
+          <button class="delete" onclick="deleteResource(${item.id})">删除</button>
         </div>
       </div>
     `;
   });
 }
 
-async function addResource() {
+async function addResource(){
   const title = document.getElementById("title").value.trim();
   const category = document.getElementById("category").value;
   const description = document.getElementById("description").value.trim();
   const link = document.getElementById("link").value.trim();
 
-  if (!title) {
+  if(!title){
     alert("资源名称不能为空");
     return;
   }
 
-  if (editingId === null) {
-    const { data: exist } = await db
-      .from("resources")
-      .select("id")
-      .eq("title", title);
-
-    if (exist && exist.length > 0) {
+  if(editingId){
+    const {error} = await db.from("resources").update({title,category,description,link}).eq("id",editingId);
+    if(error){alert("修改失败：" + error.message);return;}
+    alert("修改成功");
+    editingId = null;
+  }else{
+    const {data:exist} = await db.from("resources").select("id").eq("title",title);
+    if(exist && exist.length > 0){
       alert("该资源已经存在");
       return;
     }
-  }
 
-  if (editingId) {
-    const { error } = await db
-      .from("resources")
-      .update({ title, category, description, link })
-      .eq("id", editingId);
-
-    if (error) {
-      alert("修改失败：" + error.message);
-      return;
-    }
-
-    alert("修改成功");
-    editingId = null;
-  } else {
-    const { error } = await db
-      .from("resources")
-      .insert([{ title, category, description, link }]);
-
-    if (error) {
-      alert("发布失败：" + error.message);
-      return;
-    }
-
+    const {error} = await db.from("resources").insert([{title,category,description,link}]);
+    if(error){alert("发布失败：" + error.message);return;}
     alert("发布成功");
   }
 
-  clearForm();
+  document.getElementById("title").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("link").value = "";
   loadResources();
 }
 
-async function deleteResource(id) {
-  if (!confirm("确定删除这个资源吗？")) return;
-
-  const { error } = await db
-    .from("resources")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    alert("删除失败：" + error.message);
-    return;
-  }
-
+async function deleteResource(id){
+  if(!confirm("确定删除吗？")) return;
+  const {error} = await db.from("resources").delete().eq("id",id);
+  if(error){alert("删除失败：" + error.message);return;}
   alert("删除成功");
   loadResources();
 }
 
-async function editResource(id) {
-  const { data, error } = await db
-    .from("resources")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (error) {
-    alert("读取资源失败：" + error.message);
-    return;
-  }
+async function editResource(id){
+  const {data,error} = await db.from("resources").select("*").eq("id",id).single();
+  if(error){alert("读取失败：" + error.message);return;}
 
   editingId = id;
-
   document.getElementById("title").value = data.title || "";
-  document.getElementById("category").value = data.category || "";
+  document.getElementById("category").value = data.category || "AI工具";
   document.getElementById("description").value = data.description || "";
   document.getElementById("link").value = data.link || "";
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function clearForm() {
-  document.getElementById("title").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("link").value = "";
+  window.scrollTo(0,0);
 }
 
 loadResources();
 </script>
+
+</body>
+</html>

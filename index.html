@@ -1,8 +1,7 @@
 <script>
-const SUPABASE_URL = "https://lwc...
-.supabase.co";
+const SUPABASE_URL = "https://lwcuqcddipwmvauykjic.supabase.co";
 
-const SUPABASE_KEY = "你的KEY";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Y3VxY2RkaXB3bXZhdXlramljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzNDE1MzMsImV4cCI6MjA5MzkxNzUzM30.ERnWXOOjtflnE71pXVgYdjF1D3AXkutxX1WDkJAFbdg";
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -32,27 +31,14 @@ async function loadResources() {
   data.forEach(item => {
     list.innerHTML += `
       <div class="card">
-        <h3>${item.title}</h3>
-
-        <span class="tag">${item.category}</span>
-
+        <h3>${item.title || "未命名资源"}</h3>
+        <span class="tag">${item.category || "未分类"}</span>
         <p>${item.description || "暂无介绍"}</p >
-
-        ${
-          item.link
-            ? `<a href=" " target="_blank">打开资源</a >`
-            : ""
-        }
+        ${item.link ? `<a href=" " target="_blank">打开资源</a >` : ""}
 
         <div style="margin-top:15px;display:flex;gap:10px;">
-          <button onclick="editResource(${item.id})">
-            编辑
-          </button>
-
-          <button onclick="deleteResource(${item.id})"
-          style="background:#ef4444;color:white;">
-            删除
-          </button>
+          <button onclick="editResource(${item.id})">编辑</button>
+          <button onclick="deleteResource(${item.id})" style="background:#ef4444;color:white;">删除</button>
         </div>
       </div>
     `;
@@ -62,9 +48,7 @@ async function loadResources() {
 async function addResource() {
   const title = document.getElementById("title").value.trim();
   const category = document.getElementById("category").value;
-  const description =
-    document.getElementById("description").value.trim();
-
+  const description = document.getElementById("description").value.trim();
   const link = document.getElementById("link").value.trim();
 
   if (!title) {
@@ -72,52 +56,38 @@ async function addResource() {
     return;
   }
 
-  // 防止重复
-  const { data: exist } = await db
-    .from("resources")
-    .select("*")
-    .eq("title", title);
+  if (editingId === null) {
+    const { data: exist } = await db
+      .from("resources")
+      .select("id")
+      .eq("title", title);
 
-  if (exist && exist.length > 0 && editingId === null) {
-    alert("该资源已经存在");
-    return;
+    if (exist && exist.length > 0) {
+      alert("该资源已经存在");
+      return;
+    }
   }
 
   if (editingId) {
-
     const { error } = await db
       .from("resources")
-      .update({
-        title,
-        category,
-        description,
-        link
-      })
+      .update({ title, category, description, link })
       .eq("id", editingId);
 
     if (error) {
-      alert(error.message);
+      alert("修改失败：" + error.message);
       return;
     }
 
     alert("修改成功");
     editingId = null;
-
   } else {
-
     const { error } = await db
       .from("resources")
-      .insert([
-        {
-          title,
-          category,
-          description,
-          link
-        }
-      ]);
+      .insert([{ title, category, description, link }]);
 
     if (error) {
-      alert(error.message);
+      alert("发布失败：" + error.message);
       return;
     }
 
@@ -129,8 +99,7 @@ async function addResource() {
 }
 
 async function deleteResource(id) {
-
-  if (!confirm("确定删除吗？")) return;
+  if (!confirm("确定删除这个资源吗？")) return;
 
   const { error } = await db
     .from("resources")
@@ -138,7 +107,7 @@ async function deleteResource(id) {
     .eq("id", id);
 
   if (error) {
-    alert(error.message);
+    alert("删除失败：" + error.message);
     return;
   }
 
@@ -147,33 +116,25 @@ async function deleteResource(id) {
 }
 
 async function editResource(id) {
-
-  const { data } = await db
+  const { data, error } = await db
     .from("resources")
     .select("*")
     .eq("id", id)
     .single();
 
-  if (!data) return;
+  if (error) {
+    alert("读取资源失败：" + error.message);
+    return;
+  }
 
   editingId = id;
 
-  document.getElementById("title").value =
-    data.title || "";
+  document.getElementById("title").value = data.title || "";
+  document.getElementById("category").value = data.category || "";
+  document.getElementById("description").value = data.description || "";
+  document.getElementById("link").value = data.link || "";
 
-  document.getElementById("category").value =
-    data.category || "";
-
-  document.getElementById("description").value =
-    data.description || "";
-
-  document.getElementById("link").value =
-    data.link || "";
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function clearForm() {

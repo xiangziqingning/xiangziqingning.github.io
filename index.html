@@ -1,258 +1,186 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>星火软件资源站</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-body{
-font-family:Arial,sans-serif;
-background:#050816;
-color:white;
-padding:18px;
-}
-
-h1{
-font-size:34px;
-margin:20px 0;
-color:#38bdf8;
-}
-
-.box,.card{
-background:rgba(255,255,255,.08);
-border:1px solid rgba(255,255,255,.15);
-border-radius:22px;
-padding:18px;
-margin:16px 0;
-}
-
-input,textarea,select{
-width:100%;
-padding:14px;
-margin:8px 0;
-border-radius:12px;
-border:0;
-background:#111827;
-color:white;
-}
-
-button{
-width:100%;
-padding:14px;
-border:0;
-border-radius:14px;
-background:#38bdf8;
-color:#020617;
-font-weight:bold;
-font-size:16px;
-}
-
-.card h3{
-color:#7dd3fc;
-margin-bottom:8px;
-}
-
-.card p{
-color:#cbd5e1;
-line-height:1.6;
-}
-
-.tag{
-display:inline-block;
-margin:8px 0;
-padding:5px 10px;
-border-radius:20px;
-background:#1e40af;
-color:#bfdbfe;
-}
-
-a{
-color:#38bdf8;
-}
-</style>
-</head>
-
-<body>
-
-<h1>星火软件资源站</h1>
-
-<p>
-动态资源发布网站：提交后自动保存到 Supabase 数据库。
-</p >
-
-<div class="box">
-
-<h2>发布资源</h2>
-
-<input id="title" placeholder="资源名称">
-
-<select id="category">
-<option>AI工具</option>
-<option>设计软件</option>
-<option>手机APP</option>
-<option>学习资料</option>
-<option>网站源码</option>
-<option>其他资源</option>
-</select>
-
-<textarea id="description" placeholder="资源介绍"></textarea>
-
-<input id="link" placeholder="资源链接">
-
-<button onclick="addResource()">
-发布资源
-</button>
-
-</div>
-
-<div class="box">
-
-<h2>资源列表</h2>
-
-<div id="list">
-正在加载...
-</div>
-
-</div>
-
 <script>
+const SUPABASE_URL = "https://lwc...
+.supabase.co";
 
-const SUPABASE_URL =
-"https://lwcuqcddipwmvauykjic.supabase.co";
+const SUPABASE_KEY = "你的KEY";
 
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Y3VxY2RkaXB3bXZhdXlramljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzNDE1MzMsImV4cCI6MjA5MzkxNzUzM30.ERnWXOOjtflnE71pXVgYdjF1D3AXkutxX1WDkJAFbdg";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const db =
-supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+let editingId = null;
 
-async function loadResources(){
+async function loadResources() {
+  const list = document.getElementById("list");
+  list.innerHTML = "正在加载...";
 
-const list =
-document.getElementById("list");
+  const { data, error } = await db
+    .from("resources")
+    .select("*")
+    .order("id", { ascending: false });
 
-list.innerHTML = "正在加载...";
+  if (error) {
+    list.innerHTML = "读取失败：" + error.message;
+    return;
+  }
 
-const { data, error } =
-await db
-.from("resources")
-.select("*")
-.order("id",{ascending:false});
+  if (!data || data.length === 0) {
+    list.innerHTML = "暂无资源";
+    return;
+  }
 
-if(error){
+  list.innerHTML = "";
 
-list.innerHTML =
-"读取失败："+error.message;
+  data.forEach(item => {
+    list.innerHTML += `
+      <div class="card">
+        <h3>${item.title}</h3>
 
-return;
+        <span class="tag">${item.category}</span>
+
+        <p>${item.description || "暂无介绍"}</p >
+
+        ${
+          item.link
+            ? `<a href=" " target="_blank">打开资源</a >`
+            : ""
+        }
+
+        <div style="margin-top:15px;display:flex;gap:10px;">
+          <button onclick="editResource(${item.id})">
+            编辑
+          </button>
+
+          <button onclick="deleteResource(${item.id})"
+          style="background:#ef4444;color:white;">
+            删除
+          </button>
+        </div>
+      </div>
+    `;
+  });
 }
 
-if(!data || data.length===0){
+async function addResource() {
+  const title = document.getElementById("title").value.trim();
+  const category = document.getElementById("category").value;
+  const description =
+    document.getElementById("description").value.trim();
 
-list.innerHTML =
-"暂无资源";
+  const link = document.getElementById("link").value.trim();
 
-return;
+  if (!title) {
+    alert("资源名称不能为空");
+    return;
+  }
+
+  // 防止重复
+  const { data: exist } = await db
+    .from("resources")
+    .select("*")
+    .eq("title", title);
+
+  if (exist && exist.length > 0 && editingId === null) {
+    alert("该资源已经存在");
+    return;
+  }
+
+  if (editingId) {
+
+    const { error } = await db
+      .from("resources")
+      .update({
+        title,
+        category,
+        description,
+        link
+      })
+      .eq("id", editingId);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("修改成功");
+    editingId = null;
+
+  } else {
+
+    const { error } = await db
+      .from("resources")
+      .insert([
+        {
+          title,
+          category,
+          description,
+          link
+        }
+      ]);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("发布成功");
+  }
+
+  clearForm();
+  loadResources();
 }
 
-list.innerHTML = "";
+async function deleteResource(id) {
 
-data.forEach(item=>{
+  if (!confirm("确定删除吗？")) return;
 
-list.innerHTML += `
+  const { error } = await db
+    .from("resources")
+    .delete()
+    .eq("id", id);
 
-<div class="card">
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
-<h3>${item.title}</h3>
-
-<span class="tag">
-${item.category}
-</span>
-
-<p>
-${item.description}
-</p >
-
-<a href=" "
-target="_blank">
-
-打开资源
-
-</a >
-
-</div>
-
-`;
-
-});
-
+  alert("删除成功");
+  loadResources();
 }
 
-async function addResource(){
+async function editResource(id) {
 
-const title =
-document.getElementById("title").value;
+  const { data } = await db
+    .from("resources")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-const category =
-document.getElementById("category").value;
+  if (!data) return;
 
-const description =
-document.getElementById("description").value;
+  editingId = id;
 
-const link =
-document.getElementById("link").value;
+  document.getElementById("title").value =
+    data.title || "";
 
-if(!title){
+  document.getElementById("category").value =
+    data.category || "";
 
-alert("请输入资源名称");
+  document.getElementById("description").value =
+    data.description || "";
 
-return;
+  document.getElementById("link").value =
+    data.link || "";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
-const { error } =
-await db
-.from("resources")
-.insert([
-{
-title,
-category,
-description,
-link
+function clearForm() {
+  document.getElementById("title").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("link").value = "";
 }
-]);
-
-if(error){
-
-alert("发布失败："+error.message);
-
-return;
-}
-
-alert("发布成功");
-
-document.getElementById("title").value="";
-document.getElementById("description").value="";
-document.getElementById("link").value="";
 
 loadResources();
-
-}
-
-loadResources();
-
 </script>
-
-</body>
-</html>
